@@ -1,0 +1,38 @@
+# ── Python ──────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# ── Virtual Environment ──────────────────────
+.myenv/
+.venv/
+env/
+venv/
+
+# ── Dataset (çok büyük, GitHub'a gitmesin) ──
+data/
+*.zip
+
+# ── YOLO Eğitim Çıktıları ───────────────────
+# runs/ klasörü büyük olabilir; sadece best.pt push edilecek
+runs/
+
+# ── IDE / Editor ────────────────────────────
+.vscode/
+.idea/
+*.swp
+
+# ── OS ──────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Logs / Geçici ───────────────────────────
+*.log
+*.tmp
+results/
+
+# ── Model ağırlıkları (LFS ile push edilecek) ─
+# *.pt dosyaları Git LFS üzerinden gidecek
+# Buraya EKLEME — .gitattributes ile yönetilecek
