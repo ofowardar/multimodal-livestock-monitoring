@@ -1,7 +1,9 @@
 # Çiftlik Hayvanı Stres Tespiti — Bağımlılıklar
-# Raspberry Pi 5'te: opencv-python yerine opencv-python-headless kullanın
+# Bu dosya hem PC (Windows/Linux) hem de Raspberry Pi 5 ile tam uyumludur.
+# Raspberry Pi 5'te hızlı kurulum ve GUI bağımlılık sorunlarını önlemek için 'opencv-python-headless' tercih edilmiştir.
 
 ultralytics>=8.2.0
-opencv-python>=4.9.0
+opencv-python-headless>=4.9.0
 Pillow>=10.3.0
 numpy>=1.26.0
+roboflow>=1.1.0
