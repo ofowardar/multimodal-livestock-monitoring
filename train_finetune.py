@@ -27,7 +27,7 @@ PROJECT_NAME = "cattle_detector"
 # Eğitim Hiperparametreleri
 EPOCHS      = 50     # Epoch sayısı
 IMG_SIZE    = 640    # Görüntü boyutu
-BATCH_SIZE  = 8      # GPU varsa 16, CPU'da 4-8 önerilir
+BATCH_SIZE  = 16     # RTX 5060 için 16 optimal
 PATIENCE    = 15     # Early stopping
 LR0         = 0.001  # Fine-tune için düşük öğrenme hızı
 FREEZE      = 10     # Backbone'un ilk N katmanını dondur

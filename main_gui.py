@@ -56,6 +56,7 @@ class FarmMonitorApp:
         self._fps_counter = 0
         self._fps_time    = time.time()
         self._current_fps = 0.0
+        self._simulating_anomaly_until = 0.0
 
         self._build_ui()
 
@@ -194,7 +195,18 @@ class FarmMonitorApp:
             c3, textvariable=self._anomaly_reason_var,
             font=("Segoe UI", 9), bg=BG_CARD, fg=TEXT_DIM,
             wraplength=270,
-        ).pack(pady=(0, 8))
+        ).pack(pady=(0, 6))
+
+        # Simülasyon Test Butonu
+        self.btn_simulate = tk.Button(
+            c3, text="🚨  Anomali Simüle Et (5s)",
+            command=self._simulate_anomaly,
+            bg=COLOR_ALERT, fg="white",
+            font=("Segoe UI", 9, "bold"),
+            relief=tk.FLAT, padx=12, pady=4,
+            cursor="hand2", activebackground="#c73652",
+        )
+        self.btn_simulate.pack(pady=(0, 8))
 
         # ── Kart 4: Bireysel Takip ──
         c4 = self._card(right, "📋  Bireysel Hareket Skorları", expand=True)
@@ -288,6 +300,11 @@ class FarmMonitorApp:
         self.btn_open.config(state=tk.NORMAL)
         self.btn_cam.config(state=tk.NORMAL)
 
+    def _simulate_anomaly(self):
+        """5 saniye boyunca anomali durumunu simüle eder (akademik test için)."""
+        self._simulating_anomaly_until = time.time() + 5.0
+        print("[Simülasyon] 5 saniyelik anomali simülasyonu başlatıldı!")
+
     # ──────────────────────────────────────────
     # Thread Döngüleri
     # ──────────────────────────────────────────
@@ -319,7 +336,11 @@ class FarmMonitorApp:
             if frame_idx % conf.FRAME_SKIP != 0:
                 continue
 
-            frame = cv2.resize(frame, (conf.FRAME_WIDTH, conf.FRAME_HEIGHT))
+            # En-boy oranını bozmadan akıllı boyutlandırma
+            h, w = frame.shape[:2]
+            scale = min(conf.FRAME_WIDTH / w, conf.FRAME_HEIGHT / h)
+            if scale != 1.0:
+                frame = cv2.resize(frame, (int(w * scale), int(h * scale)))
 
             # ── FPS Hız Kontrolü ──
             # next_time'a kadar uyu — böylece video gerçek hızında oynar
@@ -352,7 +373,8 @@ class FarmMonitorApp:
                 continue    # Henüz frame gelmedi, bekle
 
             try:
-                annotated, output = self.pipeline.process_frame(frame)
+                is_simulated = time.time() < getattr(self, "_simulating_anomaly_until", 0.0)
+                annotated, output = self.pipeline.process_frame(frame, simulate_anomaly=is_simulated)
             except Exception as e:
                 import traceback
                 print(f"[Process] Hata: {e}")

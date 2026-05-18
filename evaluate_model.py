@@ -71,7 +71,7 @@ def evaluate(model_path: str, tag: str):
     results["F1"] = round(2 * p * r / (p + r + 1e-8), 4)
 
     # Sınıf bazlı metrikler
-    class_names = {0: "lie (yatan)", 1: "stand (duran)", 2: "walk (yürüyen)"}
+    class_names = {0: "stand (duran)", 1: "lie (yatan)", 2: "walk (yürüyen)"}
     if hasattr(metrics.box, "ap_class_index"):
         for i, cls_idx in enumerate(metrics.box.ap_class_index):
             cls_name = class_names.get(int(cls_idx), f"class_{cls_idx}")

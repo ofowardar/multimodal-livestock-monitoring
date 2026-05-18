@@ -13,11 +13,11 @@ Raspberry Pi 5 ve masaüstü için ortak ayarlar.
 # "yolov8n.pt" → Nano  (en hızlı, en düşük doğruluk)
 # "yolov8s.pt" → Small (daha iyi doğruluk, Raspberry Pi 5'te ~10-14 FPS)
 # "yolov8m.pt" → Medium (en iyi, Raspberry Pi'de yavaş)
-MODEL_PATH = "yolov8s.pt"   # <— Small: nano'dan %20+ daha iyi AP
+MODEL_PATH = "weights/best.pt"   # <— Small: nano'dan %20+ daha iyi AP
 
 # Tespit güven eşiği (0.0 – 1.0)
 # Düşük = daha fazla tespit ama yanlış pozitif artabilir
-CONFIDENCE_THRESHOLD = 0.30
+CONFIDENCE_THRESHOLD = 0.45
 
 # NMS IOU eşiği
 IOU_THRESHOLD = 0.5
@@ -41,8 +41,8 @@ FRAME_WIDTH  = 640
 FRAME_HEIGHT = 480
 
 # Frame atlama — Raspberry Pi optimizasyonu
-# 1 = her kare, 2 = bir atla (15 FPS'i 7-8'e indirir ama CPU'yu yarıya düşürür)
-FRAME_SKIP = 2
+# 1 = her kare (PC testi için optimal), 2 = bir atla (Pi 5 için CPU yarıya düşer)
+FRAME_SKIP = 1
 
 # ─────────────────────────────────────────────
 # HAYVAN SINIFLARI (COCO dataset)
@@ -51,10 +51,12 @@ FRAME_SKIP = 2
 # Diğer sınıfları eklemek için:
 #   14: bird  | 15: cat   | 16: dog   | 17: horse | 18: sheep
 
-ANIMAL_CLASS_IDS = [19]   # Sadece cow
+ANIMAL_CLASS_IDS = [0, 1, 2]   # 0: duran, 1: yatan, 2: yürüyen
 
 ANIMAL_CLASS_NAMES = {
-    19: "İnek",
+    0: "Duran İnek",
+    1: "Yatan İnek",
+    2: "Yürüyen İnek",
 }
 
 # ─────────────────────────────────────────────

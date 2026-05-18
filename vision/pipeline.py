@@ -23,9 +23,10 @@ from typing import Tuple, Dict, Any
 import cv2
 import numpy as np
 
+import conf
 from .detector import AnimalDetector, Detection
 from .motion_analyzer import MotionAnalyzer
-from .anomaly_detector import AnomalyDetector, AnomalyStatus, STATUS_COLORS
+from .anomaly_detector import AnomalyDetector, AnomalyStatus, STATUS_COLORS, STATUS_ICONS
 
 
 class VisionPipeline:
@@ -42,12 +43,13 @@ class VisionPipeline:
         self.motion_analyzer = MotionAnalyzer()
         self.anomaly_detector = AnomalyDetector()
 
-    def process_frame(self, frame: np.ndarray) -> Tuple[np.ndarray, Dict[str, Any]]:
+    def process_frame(self, frame: np.ndarray, simulate_anomaly: bool = False) -> Tuple[np.ndarray, Dict[str, Any]]:
         """
         Tek bir kareyi işle.
 
         Args:
             frame: BGR formatında numpy array
+            simulate_anomaly: Anomali durumunun simüle edilip edilmeyeceği
 
         Returns:
             (annotated_frame, output_dict)
@@ -57,10 +59,26 @@ class VisionPipeline:
 
         # 2. Hareket analizi
         motion_scores  = self.motion_analyzer.update(detections)
+
+        # --- LATE FUSION / STATE CORRECTION (Tez Katkısı) ---
+        # Eğer bir inek yatan değilse ve hareket skoru eşik değerin üzerindeyse,
+        # YOLO algılayamasa bile hareket analizi sayesinde onu "Yürüyen İnek" yapıyoruz.
+        for det in detections:
+            score = motion_scores.get(det.track_id, 0.0)
+            if det.class_id != 1 and score > 0.12:  # Yatan değilse ve hareketliyse
+                det.class_id = 2
+                det.class_name = conf.ANIMAL_CLASS_NAMES[2]  # "Yürüyen İnek"
+
         avg_motion     = self.motion_analyzer.get_avg_score(motion_scores)
 
         # 3. Anomali tespiti
         anomaly_status, anomaly_reason = self.anomaly_detector.update(avg_motion)
+
+        # Simülasyon durumunda metrikleri kırmızı alarma zorla
+        if simulate_anomaly:
+            anomaly_status = AnomalyStatus.ALERT
+            anomaly_reason = "[SİMÜLASYON] Kritik düzeyde stres ve agresif hareket!"
+            avg_motion = 0.85
 
         # 4. Görsel çizimler
         annotated = self._draw_annotations(
@@ -74,8 +92,8 @@ class VisionPipeline:
             "animal_count":     len(detections),
             "anomaly_status":   anomaly_status,
             "anomaly_reason":   anomaly_reason,
-            "anomaly_color":    self.anomaly_detector.color,
-            "anomaly_icon":     self.anomaly_detector.icon,
+            "anomaly_color":    STATUS_COLORS[anomaly_status],
+            "anomaly_icon":     STATUS_ICONS[anomaly_status],
         }
 
         return annotated, output

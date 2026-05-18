@@ -36,3 +36,7 @@ results/
 # ── Model ağırlıkları (LFS ile push edilecek) ─
 # *.pt dosyaları Git LFS üzerinden gidecek
 # Buraya EKLEME — .gitattributes ile yönetilecek
+
+# Genel indirilen ana dizindeki YOLO base modellerini yoksay:
+/yolov8*.pt
+/yolo*.pt
